@@ -7,6 +7,7 @@ import java.awt.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 import jbs2011.tjhickey.maze.Direction;
 import jbs2011.tjhickey.maze.MazeBoard;
@@ -19,29 +20,42 @@ import jbs2011.tjhickey.maze.MazeView;
  *
  */
 public class SaharPlayer extends MazePlayer {
-	String myname;
+	
 	
 	public SaharPlayer (String n){
 		super(n);
-		myname = n;
+
 	}
 	
 	public String getName(){
-		return this.myname;
+		return this.name;
 		
 	}
 	/**
 	 * 
-	 * Given a direction, a board, and a current position, tells you if there are any gems if you go straight from your position to the edge of the maze.
-	 * @param dir Direction to check
-	 * @param boad Board you're playing on
-	 * @param pos Position of your character
-	 * @return MazePosition of the first gem found in Direction dir. If none is found, return null;
+	 * Given a current position and a list of gems, tells you if there are any gems if you go straight from your position to the edge of the maze.
+	 * @param me Position of your character
+	 * @param jewels ArrayList of MazePositions (where the Jewels are)
+	 * @return Direction of the first matching gem. If none is found, return null;
 	 */
-	private MazePosition findGem(Direction dir, MazeBoard board, MazePosition pos){
-		
-		
-		return pos;
+	private Direction findGem(MazePosition me, ArrayList<MazePosition> jewels){
+		for(MazePosition gem : jewels){
+			if ((gem.row == me.row) && (gem.col > me.col)) {
+				//go north
+				return Direction.NORTH;
+			}
+			if ((gem.row == me.row) && (gem.col<me.col)){
+				//go south
+				return Direction.SOUTH;
+			}
+			if ((gem.col == me.col) && (gem.row>me.row)){
+				return Direction.EAST;
+			}
+			if ((gem.col == me.col) && (gem.row<me.row)){
+				return Direction.WEST;
+			}	
+		}
+		return null;
 	}
 	/* (non-Javadoc)
 	 * @see jbs2011.tjhickey.maze.MazePlayer#nextMove(java.util.HashMap, java.util.ArrayList, jbs2011.tjhickey.maze.MazeView)
@@ -70,17 +84,16 @@ public class SaharPlayer extends MazePlayer {
 		
 		Collections.shuffle(dirs);
 		for (Direction d: dirs){
-			MazePosition m = this.findGem(d);
-			if (m != null) {
-				//do stuff
-				//break;
+			Direction goD = this.findGem(whereAmI, jewels);
+			if (goD != null) {
+				return d;
 			}
 			//if m is null, there is no gem. 
-			
 		}
-		
-		
-		return Direction.SOUTH;
+		// there is no gem in any direction, go a random direction
+		//random direction code copied from RandomPlayer.java
+		int pick = new Random().nextInt(Direction.values().length);
+		return Direction.values()[pick];
 	}
 
 }
